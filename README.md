@@ -162,6 +162,13 @@ export class AppModule { }
         export class CoreModule { }
         ~~~
 
+- Dentro de src/app/core/shell/main/main.component.html lo dejamos tal que así
+    ~~~
+    <div>
+        <router-outlet></router-outlet>
+    <div>
+    ~~~
+
 - Creamos el componente not found dentro del modulo Core.
     - En consola
     ~~~
@@ -174,5 +181,98 @@ export class AppModule { }
         ng g m home --routing true
         ng g c home/home
         ~~~
+
+## commit 5
+
+- En src/app/core/core.module.ts debemos exportar ShellComponent, debemos de dejar el archivo de la siguiente manera:
+    ~~~
+    import { NgModule } from '@angular/core';
+    import { CommonModule } from '@angular/common';
+    import { ShellComponent } from './shell/shell.component';
+    import { HeaderComponent } from './shell/header/header.component';
+    import { MainComponent } from './shell/main/main.component';
+    import { FooterComponent } from './shell/footer/footer.component';
+    import { RouterModule } from '@angular/router';
+
+
+
+    @NgModule({
+    declarations: [
+        ShellComponent,
+        HeaderComponent,
+        MainComponent,
+        FooterComponent
+    ],
+    imports: [
+        CommonModule,
+        RouterModule
+    ],
+    exports: [
+        ShellComponent
+        ]
+    })
+    export class CoreModule { }
+    ~~~
+
+- En src/app/app.component.html lo dejamos con solo lo siguiente:
+    ~~~
+    <app-shell></app-shell>
+    ~~~
+
+
+- En src/environments/environment.prod.ts modificamos el archivo para que pueda embeber de la api que queremos que expote. En el caso de StarWars queda de la siguiente manera:
+    ~~~
+    export const environment = {
+    production: true,
+    logo: '../assets/img/darthVader.jpg',
+    host: 'http://swapi.dev/api/',
+    itemsPorPagina: 10
+    };
+    ~~~
+
+- En src/environments/environment.ts lo dejamos de la siguiente manera el codigo no comentado.
+    ~~~
+    export const environment = {
+    production: false,
+    logo: '../assets/img/startwars.png',
+    host: 'http://swapi.dev/api/',
+    itemsPorPagina: 10
+    };
+    ~~~
+
+- Añadimos rutas en src/app/app-routing.module.ts al loro que el componente not found te da fallo y hay que importarlo. tiene que quedar de la siguiente manera.
+    ~~~
+    import { NgModule } from '@angular/core';
+    import { RouterModule, Routes } from '@angular/router';
+    import { NotFoundComponent } from './core/not-found/not-found.component';
+
+    const routes: Routes = [
+    {
+        path: '',
+        loadChildren: () => import('./home/home.module').then(m => m.HomeModule)
+        },
+        {
+        path: "not-found" , component: NotFoundComponent
+        },
+        {
+        path: "**" , //cualquier valor que no este indicado
+        redirectTo: "not-found"
+        },
+    ];
+
+    @NgModule({
+    imports: [RouterModule.forRoot(routes)],
+    exports: [RouterModule]
+    })
+    export class AppRoutingModule { }
+    ~~~
+
+
+
+
+
+
+
+
 
 

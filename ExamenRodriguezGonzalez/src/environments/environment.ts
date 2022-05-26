@@ -3,7 +3,10 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  logo: '../assets/img/startwars.png',
+  host: 'http://swapi.dev/api/',
+  itemsPorPagina: 10
 };
 
 /*
