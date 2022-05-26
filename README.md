@@ -57,97 +57,122 @@ ng new ExamenRodriguezGonzalez --routing true -S
 
 ## commit 4
 
-- fontawesome (0.10.x	13.x	5.x && 6.x	soportado)
-    - En consola
+- ENTRAMOS EN src/app/**app.module.ts** E IMPORTAMOS EL MODULO HttpClientModule: (OJO NO TE LO OFRECE, HAY QUE PICARLO TAL CUAL):
+
+- nos tiene que quedar de la siguiente manera
+    ~~~
+    import { NgModule } from '@angular/core';
+    import { BrowserModule } from '@angular/platform-browser';
+
+    import { AppRoutingModule } from './app-routing.module';
+    import { AppComponent } from './app.component';
+
+    import { HttpClientModule } from '@angular/common/http';
+
+@NgModule({
+declarations: [
+AppComponent
+],
+imports: [
+BrowserModule,
+AppRoutingModule,
+HttpClientModule
+],
+providers: [],
+bootstrap: [AppComponent]
+})
+export class AppModule { }
+    ~~~
+- CREAR CORE MODULE
+    - En consola:
+    ~~~
+    ng g m core
+    ~~~
+
+- IMPORTAMOS CoreModule EN src/app/app.module.ts, solo en imports, la importacion de CoreModule es automatica:
+
+- Nos tiene que quedar de la siguiente manera:
+    ~~~
+    import { NgModule } from '@angular/core';
+    import { BrowserModule } from '@angular/platform-browser';
+
+    import { AppRoutingModule } from './app-routing.module';
+    import { AppComponent } from './app.component';
+
+    import { HttpClientModule } from '@angular/common/http';
+    import { CoreModule } from './core/core.module';
+
+
+
+    @NgModule({
+    declarations: [
+        AppComponent
+    ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        HttpClientModule,
+        CoreModule
+    ],
+    providers: [],
+    bootstrap: [AppComponent]
+    })
+    export class AppModule { }
+    ~~~
+
+- Creamos los componentes del Core.
+    - En consola:
+    ~~~
+    ng g c core/shell
+    ng g c core/shell/header
+    ng g c core/shell/main
+    ng g c core/shell/footer
+    ~~~
+
+- En src/app/core/shell/shell.component.html lo dejamos de la siguiente manera:
+    ~~~
+    <app-shell></app-shell>
+    ~~~
+
+- Importamos en src/app/core/core.module.ts el modulo de RouterModule.
+    - debe de quedar de la siguiente manera.
         ~~~
-        npm install @fortawesome/fontawesome-svg-core
-        npm install @fortawesome/free-solid-svg-icons
-        ~~~
-    - ver en https://github.com/FortAwesome/angular-fontawesome la compatibilidad, en caso de angular 13, 0.10.X
-    - En Consola
-        ~~~
-        npm install @fortawesome/angular-fontawesome@0.10.x
-        ~~~
-    - en src/app/**app.module.ts** tiene que quedar asi... hay que añadir el router module por que si no despues va a dar errores
-        ~~~
-        import { BrowserModule } from '@angular/platform-browser';
         import { NgModule } from '@angular/core';
-        import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-        import { AppComponent } from './app.component';
+        import { CommonModule } from '@angular/common';
+        import { ShellComponent } from './shell/shell.component';
+        import { HeaderComponent } from './shell/header/header.component';
+        import { MainComponent } from './shell/main/main.component';
+        import { FooterComponent } from './shell/footer/footer.component';
         import { RouterModule } from '@angular/router';
 
 
+
         @NgModule({
-        imports: [
-            BrowserModule,
-            FontAwesomeModule,
-            RouterModule
+        declarations: [
+            ShellComponent,
+            HeaderComponent,
+            MainComponent,
+            FooterComponent
         ],
-        declarations: [AppComponent],
-        bootstrap: [AppComponent]
+        imports: [
+            CommonModule,
+            RouterModule
+        ]
         })
-        export class AppModule { }
-        ~~~
-    - añadir a src/app/**app.component.ts** lo siguiente
-        ~~~
-        import { Component } from '@angular/core';
-        import { faCoffee } from '@fortawesome/free-solid-svg-icons';
-
-        @Component({
-        selector: 'app-root',
-        templateUrl: './app.component.html'
-        })
-        export class AppComponent {
-        faCoffee = faCoffee;
-        }
-        ~~~
-    - **Quedando src/app/app.component.ts de la siguiente manera:**
-        
-        ~~~
-        import { Component } from '@angular/core';
-        import { faCoffee } from '@fortawesome/free-solid-svg-icons';
-
-
-        @Component({
-        selector: 'app-root',
-        templateUrl: './app.component.html',
-        styleUrls: ['./app.component.css']
-        })
-        export class AppComponent {
-        title = 'Examen Rodriguez Gonzalez';
-
-        faCoffee = faCoffee;
-
-        }
+        export class CoreModule { }
         ~~~
 
-    - Añadir a src/app/**app.component.html** la siguiente linea:
-
+- Creamos el componente not found dentro del modulo Core.
+    - En consola
     ~~~
-    <fa-icon [icon]="faCoffee"></fa-icon>
+    ng g c core/not-found
     ~~~
 
-    - **Quedando src/app/app.component.html de la siguiente manera**
-
+- CREAMOS EL MODULO Y COMPONENTE HOME:
+    - En consola
         ~~~
-        <router-outlet></router-outlet>
-        <fa-icon [icon]="faCoffee"></fa-icon>
+        ng g m home --routing true
+        ng g c home/home
         ~~~
-**la pagina de angular se queda en blanco... no asustarse.**
-
-## commit 5
-
-- En Consola 
-~~~
-ng g m core
-ng g m home --routing true
-ng g c core/shell
-ng g c core/shell/header
-ng g c core/shell/main
-ng g c core/shell/footer
-ng g c core/not-found
-~~~
-
-
 
 
