@@ -267,12 +267,458 @@ export class AppModule { }
     export class AppRoutingModule { }
     ~~~
 
+## commit 6
+
+- En src/app/core/shell/shell.component.html debe de quedar asi:
+~~~
+<app-header></app-header>
+<app-main></app-main>
+<app-footer></app-footer>
+
+~~~
 
 
+- Añadimo Header en src/app/core/shell/header/header.component.html dejandolo de la siguiente manera
+~~~
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark align-items-center fixed-top">
+  <a class="navbar-brand " routerLink="/"><span
+  class="sr-only">(current)</span></a>
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ejercicioProto"
+  aria-controls="navbarSupportedContent" aria-controls="ejercicioProto" aria-expanded="false"
+  aria-label="Toggle navigation">
+  <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="ejercicioProto">
+  <ul class="navbar-nav mr-auto">
+  <li class="nav-item dropdown pt-3" routerLinkActive="router-link-active">
+  <a class="nav-link dropdown-toggle lera" id="navbarDropdown" role="button" data-toggle="dropdown"
+  aria-haspopup="true" aria-expanded="false">
+  Personajes
+  </a>
+  <div class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown">
+  <a class="dropdown-item text-warning" routerLink="personajes">Todos</a>
+  <a class="dropdown-item text-warning" routerLink="personajes/formulario">Crear Personaje</a>
+  </div>
+  </li>
+  </ul>
+  </div>
+  </nav>
+
+~~~
+
+- CREAMOS EL MODULO DE PERSONAJES O LO QUE SEA:
+
+    - En consola
+        ~~~
+        ng g m personajes --routing true
+        ~~~
+
+- AÑADIMOS LA RUTA EN src/app/app-routing.module.ts
+~~~
+{
+path: 'personajes',
+loadChildren: () => import('./personajes/personajes.module').then(m => m.PersonajesModule)
+},
+~~~
 
 
+- CREAMOS COMPONENTES DENTRO DEL MODULO PERSONAJES:
+
+    - En consola
+~~~
+ng g c personajes/personajes
+ng g c personajes/personaje-item
+ng g c personajes/personaje-form
+~~~
+
+- añadimos ruta en src/app/personajes/personajes-routing.module.ts quedando de la siguiente manera
+~~~
+import { NgModule } from '@angular/core';
+import { RouterModule, Routes } from '@angular/router';
+import { PersonajesComponent } from './personajes/personajes.component';
+
+const routes: Routes = [
+  {
+    path: '',
+    component: PersonajesComponent
+  }
+];
+
+@NgModule({
+  imports: [RouterModule.forChild(routes)],
+  exports: [RouterModule]
+})
+export class PersonajesRoutingModule { }
+~~~
+
+- IMPORTAMOS FORMSMODULE EN src/app/personajes/personajes.module.ts:
+
+~~~
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+import { PersonajesRoutingModule } from './personajes-routing.module';
+import { PersonajesComponent } from './personajes/personajes.component';
+import { PersonajeItemComponent } from './personaje-item/personaje-item.component';
+import { FormsModule } from '@angular/forms';
 
 
+@NgModule({
+  declarations: [
+    PersonajesComponent,
+    PersonajeItemComponent
+  ],
+  imports: [
+    CommonModule,
+    PersonajesRoutingModule,
+    FormsModule
+  ]
+})
+export class PersonajesModule { }
 
+~~~
+
+- CREAMOS INTERFAZ DENTRO DE MODULO PERSONAJES Y DECLARAMOS TODOS LOS ATRIBUTOS QUE APAREZCAN EN LA API:
+
+En Consola:
+
+~~~
+ng g i personajes/models/personaje
+~~~
+
+Lo dejamos asi:
+~~~
+export interface Personaje {
+  nombre: string;
+  estatura: string;
+  peso: string;
+  colorPelo: string;
+  colorPiel: string;
+  colorOjos: string;
+  fechaNac: string;
+  genero: string;
+  planeta: string;
+  peliculas: any[];
+}
+~~~
+
+- REAMOS LA CLASE DENTRO DEL MÓDULO PERSONAJES
+
+En consola
+
+~~~
+ng g class personajes/models/personaje-impl
+~~~
+
+Implemento lo siguiente en la clase personajes/models/personaje-impl
+
+~~~
+import { Personaje } from './personaje';
+
+export class PersonajeImpl implements Personaje {
+  nombre: string;
+  estatura: string;
+  peso: string;
+  colorPelo: string;
+  colorPiel: string;
+  colorOjos: string;
+  fechaNac: string;
+  genero: string;
+  planeta: string;
+  peliculas: any[];
+
+  // tslint:disable-next-line: max-line-length
+  constructor(name: any, height: any, mass: any, hair_color: any, skin_color: any, eye_color: any, birth_year: any, gender: any, homeworld: any, films: any[]) {
+    this.nombre = name;
+    this.estatura = height;
+    this.peso = mass;
+    this.colorPelo = hair_color;
+    this.colorPiel = skin_color;
+    this.colorOjos = eye_color;
+    this.fechaNac = birth_year;
+    this.genero = gender;
+    this.planeta = this.getIdMundo(homeworld);
+    this.peliculas = films;
+  }
+
+  getIdMundo(url: string): string {
+    url = url.slice(0, url.length - 1)
+    return url.slice(url.lastIndexOf('/') + 1, url.length);
+  }
+}
+~~~
+
+
+COMPONENTE CONTENEDOR src/app/personajes/personajes/personajes.component.ts:
+
+~~~
+import { Component, OnInit } from '@angular/core';
+import { AuxiliarService } from 'src/app/service/auxiliar.service';
+import { Personaje } from '../models/personaje';
+import { PersonajeImpl } from '../models/personaje-impl';
+import { PersonajeService } from '../service/personaje.service';
+
+@Component({
+  selector: 'app-personajes',
+  templateUrl: './personajes.component.html',
+  styleUrls: ['./personajes.component.css']
+})
+export class PersonajesComponent implements OnInit {
+  personajes: Personaje[] = [];
+  todosPersonajes: Personaje[] = [];
+  personajeVerDatos: Personaje = new PersonajeImpl('','','','','','','','','',[],);
+  numPaginas: number = 0;
+
+  constructor(
+    private personajeService: PersonajeService,
+    private auxService: AuxiliarService) { }
+
+  ngOnInit(): void {
+    this.personajeService.getPersonajes().subscribe((response) => this.personajes = this.personajeService.extraerPersonajes(response));
+    this.getTodosPersonajes();
+  }
+
+  verDatos(personaje: Personaje): void {
+    this.personajeVerDatos = personaje;
+  }
+
+   onPersonajeEliminar(personaje: Personaje): void {
+    console.log(`He eliminado a ${personaje.nombre}`);
+    this.personajes = this.personajes.filter(p => personaje !== p)
+  }
+
+  getTodosPersonajes(): void {
+    this.personajeService.getPersonajes().subscribe(r => {
+      this.numPaginas = this.auxService.getPaginasResponse(r);
+      for (let index = 1; index <= this.numPaginas; index++) {
+        this.personajeService.getPersonajesPagina(index)
+          .subscribe(response => {
+            this.todosPersonajes.push(...this.personajeService.extraerPersonajes(response));
+          });
+      }
+    });
+  }
+}
+~~~
+
+
+- modificamos src/app/personajes/personajes/personajes.component.html
+
+~~~
+<div class="row">
+  <div class="col-10 col-sm-10 col-md-3 col-lg-3 col-xl-3">NOMBRE</div>
+  <div class="col-10 col-sm-10 col-md-3 col-lg-2 col-xl-2">GÉNERO</div>
+  <div class="col-10 col-sm-10 col-md-3 col-lg-3 col-xl-3">FECHA NACIMIENTO</div> 
+
+</div>
+
+~~~
+
+COMPONENTE PRESENTADOR src/app/personajes/personaje-item/personaje-item.component.ts:
+
+~~~
+import { Component, OnInit } from '@angular/core';
+
+@Component({
+  selector: 'app-personaje-item',
+  templateUrl: './personaje-item.component.html',
+  styleUrls: ['./personaje-item.component.css']
+})
+export class PersonajeItemComponent implements OnInit {
+
+  constructor() { }
+
+  ngOnInit(): void {
+  }
+
+}
+
+~~~
+
+COMPONENTE PRESENTADOR src/app/personajes/personaje-item/personaje-item.component.html:
+~~~
+<div class="row mb-1">
+  <hr class='w-100'>
+  <div class="col-6 col-sm-6 col-md-2 col-lg-2 col-xl-3"><a class="" data-toggle="modal"
+      data-target="#modalPersonaje" (click)='personajeSeleccionado.emit(personaje)'> {{personaje.nombre}}</a></div>
+  <div class="col-6 col-sm-6 col-md-3 col-lg-2 col-xl-2">{{personaje.genero | i18nSelect: genderMap}}</div>
+  <div class="col-6 col-sm-6 col-md-3 col-lg-3 col-xl-3">{{personaje.fechaNac | lowercase}}</div>
+  <div class="col-16 col-sm-6 col-md-3 col-lg-2 col-xl-2">
+      <button class="btn btn-info" [routerLink]="['/planeta', personaje.planeta]">Planeta</button>
+  </div>
+  <div class="col-6 col-sm-6 col-md-2 col-lg-2 col-xl-2">
+        <div *ngIf='personaje.colorPelo != "none" && personaje.colorPelo != "n/a"; else elseBlock'>{{personaje.colorPelo}}
+        </div>
+ </div>
+ <ng-template #elseBlock>
+      <span>No tengo Pelo</span>
+ </ng-template>
+</div>
+
+~~~
+
+CREACION SERVICIO GLOBAL (TRANSVERSAL) A TODA LA APLICACION:
+
+En consola:
+~~~
+ng g service service/auxiliar
+~~~
+
+
+en src/app/service/auxiliar.service.ts
+
+~~~
+
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { environment } from 'src/environments/environment';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuxiliarService {
+  itemsPorPagina: number = environment.itemsPorPagina;
+
+  constructor(private http: HttpClient) { }
+
+  getItemsResponse(respuestaApi: any): number {
+    return respuestaApi.count;
+  }
+
+  getPaginasResponse(respuestaApi: any): number {
+    return Math.ceil(this.getItemsResponse(respuestaApi) / this.itemsPorPagina);
+  }
+
+  getItemsPorPagina(urlEndPoint: string, pagina: number): Observable<any> {
+    return this.http.get<any>(`${urlEndPoint}?page=${pagina}`)
+  }
+}
+~~~
+
+AÑADIR COMO PROVEEDOR EL SERVICIO AUXILIARSERVICE EN PERSONAJES MODULE:
+debe de quedar asi
+
+~~~
+import { NgModule } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
+import { PersonajesRoutingModule } from './personajes-routing.module';
+import { PersonajesComponent } from './personajes/personajes.component';
+import { PersonajeItemComponent } from './personaje-item/personaje-item.component';
+import { FormsModule } from '@angular/forms';
+import { AuxiliarService } from '../service/auxiliar.service';
+
+
+NgModule({
+  declarations: [PersonajesComponent, 
+    PersonajeItemComponent],
+  imports: [
+    CommonModule,
+    PersonajesRoutingModule,
+    FormsModule
+  ],
+  providers: [AuxiliarService]
+})
+export class PersonajesModule { }
+
+~~~
+
+CREACION SERVICIO EN EL MODULO PERSONAJES
+
+En Consola:
+
+~~~
+ng g service personajes/service/personaje
+~~~
+
+El archivo src/app/personajes/service/personaje.service.ts debe de quedar asi
+
+~~~
+import { HttpClient } from '@angular/common/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs';
+import { AuxiliarService } from 'src/app/service/auxiliar.service';
+import { environment } from 'src/environments/environment';
+import { Personaje } from '../models/personaje';
+import { PersonajeImpl } from '../models/personaje-impl';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class PersonajeService {
+  private host: string = environment.host;
+  private urlEndPoint: string = `${this.host}people`;
+
+  constructor(
+    private http: HttpClient,
+    private auxService: AuxiliarService) { }
+
+
+  getPersonajes(): Observable<any> {
+    return this.http.get<any>(this.urlEndPoint);
+  }
+
+  extraerPersonajes(respuestaApi: any): Personaje[] {
+    const personajes: Personaje[] = [];
+    respuestaApi.results.forEach((p: any) => {
+      personajes.push(this.mapearPersonaje(p));
+
+    });
+    return personajes;
+  }
+
+  mapearPersonaje(personajeApi: any): PersonajeImpl {
+    return new PersonajeImpl(
+      personajeApi.name,
+      personajeApi.height,
+      personajeApi.mass,
+      personajeApi.hair_color,
+      personajeApi.skin_color,
+      personajeApi.eye_color,
+      personajeApi.birth_year,
+      personajeApi.gender,
+      personajeApi.homeworld,
+      personajeApi.films);
+  }
+
+  create(personaje: Personaje): void {
+    console.log(`Se ha creado el personaje: ${JSON.stringify(personaje)}`);
+  }
+
+  getPersonajesPagina(pagina: number): Observable<any> {
+    return this.auxService.getItemsPorPagina(this.urlEndPoint, pagina);
+  }
+}
+~~~
+
+
+En src/app/personajes/personaje-form/personaje-form.component.ts
+~~~
+
+import { Component, OnInit } from '@angular/core';
+import { PersonajeImpl } from '../models/personaje-impl';
+import { PersonajeService } from '../service/personaje.service';
+
+@Component({
+  selector: 'app-personaje-form',
+  templateUrl: './personaje-form.component.html',
+  styleUrls: ['./personaje-form.component.css']
+})
+export class PersonajeFormComponent implements OnInit {
+  personaje: PersonajeImpl = new PersonajeImpl('', '', '', '', '', '', '', '', '', []);
+
+  constructor(private personajeService: PersonajeService) { }
+
+  ngOnInit(): void {
+  }
+
+  create(): void {
+    this.personajeService.create(this.personaje);
+  }
+
+}
+~~~
 
 

@@ -1,0 +1,46 @@
+<form #personajeForm="ngForm">
+  <div class="form-row py-2">
+    <div class="col-lg-4 col-md-12">
+      <label>Nombre <sup class="text-danger">*</sup></label>
+      <input type="text" class="form-control" [(ngModel)]="personaje.nombre" placeholder="Nombre Personaje" name="pers"
+        required minlength="3" #pers="ngModel" [ngClass]="{
+          'is-invalid': pers.invalid && (pers.dirty || pers.touched),
+          'is-valid': !pers.invalid
+        }" />
+      <div class="text-danger" *ngIf="pers.invalid && (pers.dirty || pers.touched)">
+        <div *ngIf="pers.errors">
+          El Nombre del Personaje es obligatorio
+        </div>
+        <div *ngIf="pers.errors">
+          El Nombre del Personaje debe tener al menos 3
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="form-row py-2">
+    <div class="col-lg-4 col-md-12">
+      <label for="validationServer02">Fechas Nacimiento <sup class="text-danger"></sup></label>
+      <input type="text" class="form-control" [(ngModel)]="personaje.fechaNac" placeholder="Fecha Nacimiento Personaje"
+        minlength="5" maxlength="5" required name="fechNac" #fechNac="ngModel" [ngClass]="{
+          'is-invalid': fechNac.invalid && (fechNac.dirty || fechNac.touched),
+          'is-valid': !fechNac.invalid
+        }" />
+      <div class="text-danger" *ngIf="fechNac.invalid && (fechNac.dirty || fechNac.touched)">
+        <div *ngIf="fechNac.errors">
+          La Fecha de Nacimiento es obligatorio
+        </div>
+        <div *ngIf="fechNac.errors">
+          La fecha de nacimiento debe tener 5 Caracteres
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="form-row justify-content-between pt-5">
+    <div class="col-lg-5 col-md-12">
+      <button class="btn btn-primary" role="button" (click)="create()" routerLink='/personajes'
+        [disabled]="!personajeForm.form.valid">
+        Crear Personaje
+      </button>
+    </div>
+  </div>
+</form>

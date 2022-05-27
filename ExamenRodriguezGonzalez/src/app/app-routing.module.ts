@@ -14,6 +14,10 @@ const routes: Routes = [
     path: "**" , //cualquier valor que no este indicado
     redirectTo: "not-found"
     },
+    {
+    path: 'personajes',
+    loadChildren: () => import('./personajes/personajes.module').then(m => m.PersonajesModule)
+    },
 ];
 
 @NgModule({
