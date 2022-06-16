@@ -201,6 +201,11 @@ export class AppModule { }
     ~~~
     ng g m core
     ~~~
+    
+- Para importar fontawesome/fortawesome-Angular... visita esta web... 
+    https://www.npmjs.com/package/@fortawesome/angular-fontawesome
+    
+    
 
 - IMPORTAMOS CoreModule EN src/app/app.module.ts, solo en imports, la importacion de CoreModule es automatica:
 
