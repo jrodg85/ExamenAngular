@@ -55,7 +55,7 @@ Luego navegue a su aplicación angular 13 y abra el archivo angular.json. Y lueg
 angular.json debe de quedar se la siguiente manera y aplicandolo a inmoguanche
     
     ~~~
-        {
+    {
       "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
       "version": 1,
       "newProjectRoot": "projects",
@@ -154,20 +154,16 @@ angular.json debe de quedar se la siguiente manera y aplicandolo a inmoguanche
                   "src/assets"
                 ],
                 "styles": [
-                  "src/styles.css",
-                  "node_modules/bootstrap/dist/css/bootstrap.min.css"
+                  "src/styles.css"
                 ],
-                "scripts": [
-                  "node_modules/bootstrap/dist/js/bootstrap.min.js"
-                ]
+                "scripts": []
               }
             }
           }
         }
       },
-      "defaultProject": "InmoGuancheCRM"
+      "defaultProject": "frontend"
     }
-
 
     ~~~
     
